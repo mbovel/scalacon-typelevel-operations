@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="author" content="Matt Bovel @LAMP/LARA, EPFL">
+  <meta name="dcterms.date" content="2022-10-05">
+  <title>Scala type-level operations</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="https://unpkg.com/reveal.js@^4//dist/reset.css">
+  <link rel="stylesheet" href="https://unpkg.com/reveal.js@^4//dist/reveal.css">
+  <style>
+    .reveal .sourceCode {  /* see #7635 */
+      overflow: visible;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+  </style>
+  <link rel="stylesheet" href="https://unpkg.com/reveal.js@^4//dist/theme/white.css" id="theme">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+   var mathElements = document.getElementsByClassName("math");
+   var macros = [];
+   for (var i = 0; i < mathElements.length; i++) {
+    var texText = mathElements[i].firstChild;
+    if (mathElements[i].tagName == "SPAN") {
+     katex.render(texText.data, mathElements[i], {
+      displayMode: mathElements[i].classList.contains('display'),
+      throwOnError: false,
+      macros: macros,
+      fleqn: false
+     });
+  }}});
+  </script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.3.1/styles/atom-one-light.min.css">
+  <link rel="stylesheet" href="custom.css" />
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide">
+  <h1 class="title">Scala type-level operations</h1>
+  <p class="author"><a href="mailto:matthieu@bovel.net">Matt Bovel</a> @<a href="https://www.epfl.ch/labs/lamp/">LAMP</a>/<a href="https://lara.epfl.ch/w/">LARA</a>, <a href="https://www.epfl.ch/fr/">EPFL</a></p>
+  <p class="date">October 5, 2022</p>
+</section>
+<section id="TOC">
+<nav role="doc-toc"> 
+<h2 id="toc-title">Outline</h2>
+<ul>
+<li><a href="#/introduction">Introduction</a>
+<ul>
+<li><a href="#/rockets-explode">Rockets explode</a></li>
+<li><a href="#/types-can-help">Types can help</a></li>
+</ul></li>
+</ul>
+</nav>
+</section>
+
+<section>
+<section id="introduction" class="title-slide slide level2">
+<h2>Introduction</h2>
+
+</section>
+<section id="rockets-explode" class="slide level3">
+<h3>Rockets explode</h3>
+<div class="float">
+<p><img src="images/Explosion_of_first_Ariane_5_flight_June_4_1996.jpg" width="600px" height="395px"></p>
+<p><small><a href="https://www.esa.int/ESA_Multimedia/Images/2009/09/Explosion_of_first_Ariane_5_flight_June_4_1996">Explosion of the first Ariane 5 flight, June 4, 1996<br/>© ESA (European Space Agency)</a></small></p>
+</div>
+<div style="height: 395px; display: flex; align-items: center; justify-content: center;">
+<p><span class="math display">
+\gdef\tm#1{\textcolor{953800}{\texttt{{#1}}}}
+\gdef\tp#1{\textcolor{8250df}{\texttt{{#1}}}}
+\tm{x}
+</span></p>
+</div>
+<aside class="notes">
+<p><strong>Title Slide</strong></p>
+<p>Hello, my name is Matt Bovel and I am a PhD student at EPFL. I am working at LAMP, the lab that builds Scala. It’s just next to the Scala center. And I am co-supervised by Martin Odersky that you all know.</p>
+<p>My research interests are center around what we can qualify as precise types and so today, I will talk about precise types. More specifically, I will mainly talk about singleton types, refinement types, match types and type-level operations. I will give a pretty general presentation. It’s not very much research-oriented. Instead, after a very brief introduction the presentation will be completely examples-based. I will show practical examples of what we can achieve with the type system of Scala today, and also what we might be able to achieve in the future. So even if you already know everything about these precise types, you might be interested in this later part.</p>
+<p><strong>TOC</strong></p>
+<p>Ok, before diving into the subject, lets me zoom out for a few slides.</p>
+<p><strong>This slide</strong></p>
+<p>Writing software is hard. It takes time. And even so, all programs that we use everyday are full of bugs. Software bugs cost the U.S. economy an estimated $59.5 billion annually, or about 0.6 percent of the gross domestic product. So we lose time, money, and in extreme situation this can lead to catastrophes, like the crash of Ariane 5—from which you have a picture here.</p>
+<p>How can we help? Or <em>what</em> can help?</p>
+</aside>
+</section>
+<section id="types-can-help" class="slide level3">
+<h3>Types can help</h3>
+<div class="float">
+<p><img src="images/Artist_s_view_of_the_configuration_of_Ariane_6_using_four_boosters_A64_pillars.jpg" width="600px" height="395px"></p>
+<p><small><a href="https://www.esa.int/ESA_Multimedia/Images/2018/06/Artist_s_view_of_the_configuration_of_Ariane_6_using_four_boosters_A643">Artist’s view of the configuration of Ariane 6 using four boosters (A64)<br/>© ESA (European Space Agency)</a></small></p>
+</div>
+<div style="height: 395px; display: flex; align-items: center; justify-content: center;">
+<p><span class="math display">\tm{x}:\tp{Long}</span></p>
+</div>
+<aside class="notes">
+</aside>
+</section></section>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/reveal.js@^4//dist/reveal.js"></script>
+
+  <!-- reveal.js plugins -->
+  <script src="https://unpkg.com/reveal.js@^4//plugin/notes/notes.js"></script>
+  <script src="https://unpkg.com/reveal.js@^4//plugin/search/search.js"></script>
+  <script src="https://unpkg.com/reveal.js@^4//plugin/zoom/zoom.js"></script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+        // Display controls in the bottom right corner
+        controls: true,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: true,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'bottom-right',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: false,
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: true,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'default',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: true,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'none',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'fade',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1200,
+
+        height: 675,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 0.14,
+
+        // reveal.js plugins
+        plugins: [
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.3.1/highlight.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.3.1/languages/scala.min.js"></script><script>hljs.highlightAll();</script>
+    </body>
+</html>
