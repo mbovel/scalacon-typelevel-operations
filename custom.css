@@ -105,8 +105,14 @@ code {
     background-color: hsla(301, 63%, 40%, 1);
 }
 
-#TOC ul {
+#TOC > nav > ul {
     columns: 2;
+    font-size: 0.45em;
+    max-height: 520px;
+}
+
+#TOC li:empty {
+    display: none;
 }
 
 .float {
