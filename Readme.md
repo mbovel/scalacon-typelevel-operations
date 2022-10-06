@@ -1,6 +1,7 @@
 # Presentation template
 
-[Presentation](https://mbovel.github.io/scalacon-typelevel-operations/presentation).
+- [Presentation](https://mbovel.github.io/scalacon-typelevel-operations/presentation)
+- [Example](https://github.com/mbovel/scalacon-typelevel-operations/tree/main/examples)
 
 ## How to build
 
