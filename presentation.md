@@ -1,7 +1,6 @@
 ---
 title: Type-level Programming<br/>in Scala
 author: "[Matt Bovel](mailto:matthieu@bovel.net) @[LAMP](https://www.epfl.ch/labs/lamp/)/[LARA](https://lara.epfl.ch/w/), [EPFL](https://www.epfl.ch/fr/)"
-
 ---
 
 # Introduction

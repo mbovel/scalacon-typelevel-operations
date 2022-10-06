@@ -1,6 +1,6 @@
 # Presentation template
 
-[Presentation](https://mbovel.github.io/scala-compiletime-presentation/presentation.html).
+[Presentation](https://mbovel.github.io/scalacon-typelevel-operations/presentation).
 
 ## How to build
 
