@@ -1,5 +1,7 @@
 import scala.compiletime.ops.int.*
 
+// Not included in the talk
+
 sealed abstract class StaticList[+T]
 
 object Nil extends StaticList[Nothing]

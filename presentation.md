@@ -62,7 +62,6 @@ $$\tm{x}:\tp{Long}$$
 
 </div>
 
-
 <aside class="notes">
 
 Well, one of the things that can help are _type systems_. The idea of a type system is to assign a type to each element of a program to make sure that these elements are combined appropriately. If I want to sum two elements and I write $x + y$ for example, I want to make sure that $x$ and $y$ are numbers. If these are something else, then the operation written `+` might have a complete different meaning or not make sense at all.
@@ -70,7 +69,6 @@ Well, one of the things that can help are _type systems_. The idea of a type sys
 Types like strings, integer or boolean are not enough. [...]
 
 </aside>
-
 
 ## Literal types
 
@@ -105,8 +103,6 @@ val e: a.type = b // Error: found (b: Int)
 
 ---
 
-<div class="fragment">
-
 It is called *path*-dependent because it can refer to nested members as well:
 
 ```scala
@@ -114,7 +110,6 @@ object Foo:
     val x: 3 = 3
 summon[Foo.x.type =:= 3]
 ```
-</div>
 
 <div class="fragment">
 
@@ -182,6 +177,20 @@ val a: 2 + 2 = 4
 <small>See [Add primitive compiletime operations on singleton types #7628](https://github.com/lampepfl/dotty/pull/7628).</small>
 
 </div>
+
+## Match types
+
+```scala
+type IsEmpty[S <: String] <: Boolean = S match {
+  case "" => true
+  case _ => false
+}
+
+summon[IsEmpty[""] =:= true]
+summon[IsEmpty["hello"] =:= false]
+```
+
+<small>See [Blanvillain, O., Brachthäuser, J., Kjaer, M., & Odersky, M. (2021). Type-Level Programming with Match Types. 70.](http://infoscience.epfl.ch/record/290019)</small>
 
 # Example: `printf`
 
@@ -337,7 +346,7 @@ Cannot reason about operations with non-constant operands.
 
 ```scala
 // Summing x n times is normalized to x * n.
-summon[n.type * m.type =:= m.type + n.type]
+summon[n.type + m.type =:= m.type + n.type]
 ```
 
 ## Grouping
@@ -368,7 +377,7 @@ Should the user see normalized types?
 ```scala
 val m: 3 = 3
 val n: Int  = ???
-val v /*:Vec[n.type + 3, String]()*/ = Vec[m.type + n.type, String]()
+val v /*:Vec[n.type + 3, String]*/ = Vec[m.type + n.type, String]()
 ```
 
 ## Example: tf-dotty (with abstract dimensions)
@@ -382,7 +391,7 @@ val res = tf.reshape(tensor, y #: x #: SNil)
 
 <small>See [github.com/MaximeKjaer/tf-dotty](https://github.com/MaximeKjaer/tf-dotty), in particular the [implementation of `reshape`](https://github.com/MaximeKjaer/tf-dotty/blob/45af57dd0f60cb2d2fc9cf56f963b6ca4bd32909/modules/tensorflow/src/main/scala/io/kjaer/tensorflow/core/tf.scala#L82-L97).</small>
 
-<small>See [Type-Level Programming with Match Types](https://infoscience.epfl.ch/record/290019).</small>
+<small>See [Blanvillain, O., Brachthäuser, J., Kjaer, M., & Odersky, M. (2021). Type-Level Programming with Match Types. 70.](http://infoscience.epfl.ch/record/290019)</small>
 
 ---
 
@@ -526,7 +535,7 @@ val person: Person {name: "Ada"} =
 
 ---
 
- **Advantage:** simple, nothing to change in the language.
+**Advantage:** simple, nothing to change in the language.
 
 **Drawbacks:**
 
@@ -600,7 +609,6 @@ Could we do the same for constructor types, type-level operations and tuples?
 - verbosity (and not only for API writers),
 - complex implementation.
 
-
 ## Solution 4: a dedicated inference mode?
 
 Proposition: type everything precisely when a value or a function is annotated with the `precise` keyword.
@@ -617,6 +625,24 @@ precise def precise() =
 ```
 
 <small>A separate inference mode was first proposed in [“Coming to Terms with Your Choices: An Existential Take on Dependent Types”](https://arxiv.org/abs/2011.07653) (with the `dependent` here). Our implementation follows a similar but weaker semantic. In our case, `precise` simply instructs the system to type the body of the function "as precisely as possible", while in the linked technical report it means “as precise as its implementation”.</small>
+
+---
+
+Inferred types:
+
+```scala
+precise def precise() =
+  val v1 /*: (v1: (1: Int))*/ = 1
+  val v2 /*: (v2: (3: Int))**/ = 2 + v1
+  precise def isString(x: Any) /*: (x : Any) match {
+    case String => (true : Boolean)
+    case Any => (false : Boolean)
+  }*/ = x match
+    case _: String => true
+    case _ => false
+  val v3 /*: (false: Boolean) */ = isString(42)
+  val v4 /*: Foo {val x = 42} */ = Foo(42)
+```
 
 ---
 

@@ -1,4 +1,6 @@
-//> using scala "3.2.0-RC4"
+//> using scala "3.2.0"
+
+// Inspired by https://github.com/MaximeKjaer/tf-dotty
 
 import scala.compiletime.ops.int.*
 

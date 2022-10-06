@@ -1,5 +1,6 @@
-//> using scala "3.2.0"
 //> using options "-Xprint:typer"
+
+// Needs to be compiled with Dotty at https://github.com/dotty-staging/dotty/tree/mb/linear-artihmetic-ops-normal-form-2.
 
 import scala.compiletime.ops.int.*
 

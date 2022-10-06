@@ -12,7 +12,7 @@
 }
 
 .reveal .slides {
-    text-align:left;
+    text-align: left;
 }
 
 .reveal pre {
@@ -90,14 +90,14 @@ code {
     background-color: #a626a4;
 }
 
-.reveal ul, .reveal ol {
+.reveal ul,
+.reveal ol {
     display: block;
     margin: 1em 0em;
     padding-left: 1.5em;
 }
 
 .reveal .slides section .fragment {
-    opacity: 0.25;
     visibility: visible;
 }
 
@@ -105,7 +105,7 @@ code {
     background-color: hsla(301, 63%, 40%, 1);
 }
 
-#TOC > nav > ul {
+#TOC>nav>ul {
     columns: 2;
     font-size: 0.45em;
     max-height: 520px;
@@ -119,6 +119,6 @@ code {
     float: left;
 }
 
-.float > *:first-child {
+.float>*:first-child {
     margin-top: 0;
 }

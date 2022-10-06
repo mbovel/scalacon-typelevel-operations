@@ -1,4 +1,4 @@
-all: presentation.html presentation.pdf
+all: presentation.html
 
 %.preprocessed.md: %.md Makefile preprocess.sc examples/*.scala
 	./preprocess.sc $< > $@
@@ -30,11 +30,6 @@ all: presentation.html presentation.pdf
 		-V toc-title="Outline" \
 		-V history="true" \
 		--shift-heading-level-by=1
-
-%.pdf: %.html
-	docker run --rm --volume "`pwd`:/slides" --workdir="/slides" --user `id -u`:`id -g` astefanutti/decktape \
-		$< \
-		$@
 
 .PHONY: clean
 
