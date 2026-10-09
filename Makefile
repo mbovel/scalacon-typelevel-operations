@@ -10,12 +10,14 @@ all: presentation.html
 		-t revealjs \
 		--standalone \
 		--output $@ \
-		--metadata=date:"`date "+%B %e, %Y"`" \
+		--metadata=date:"October 6, 2022" \
 		--no-highlight \
 		--katex \
 		`# See reveal.js themes here: https://revealjs.com/themes/` \
 		`# Use "black" for dark mode.` \
 		-V theme="white" \
+		`# Pandoc's default unpkg URL (reveal.js@^4/ + /dist) now 404s, so pin the version.` \
+		-V revealjs-url="https://cdn.jsdelivr.net/npm/reveal.js@4.4.0" \
 		`# See higlight.js themes here: https://highlightjs.org/static/demo/` \
 		`# Use "atom-one-dark.min.css" for dark mode. Other reasonnable light themes include xcode.css and vs.css.` \
 		-V header-includes='<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.3.1/styles/atom-one-light.min.css">' \
